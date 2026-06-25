@@ -12,6 +12,7 @@ public class BetVO {
     private String betNo;
     private Long marketId;
     private String marketTitle;
+    private String username;
     private String assetSymbol;
     private BetDirection direction;
     private BigDecimal amount;
@@ -29,6 +30,8 @@ public class BetVO {
     public void setMarketId(Long marketId) { this.marketId = marketId; }
     public String getMarketTitle() { return marketTitle; }
     public void setMarketTitle(String marketTitle) { this.marketTitle = marketTitle; }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
     public String getAssetSymbol() { return assetSymbol; }
     public void setAssetSymbol(String assetSymbol) { this.assetSymbol = assetSymbol; }
     public BetDirection getDirection() { return direction; }

@@ -33,6 +33,7 @@ export const api = {
 
   // price
   btcPrice: () => request('/api/price/btc'),
+  btcPriceHistory: (limit = 60) => request('/api/price/btc/history?limit=' + limit),
 
   // market
   activeMarkets: () => request('/api/market/active'),

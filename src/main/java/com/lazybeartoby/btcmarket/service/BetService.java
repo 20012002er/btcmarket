@@ -9,6 +9,7 @@ import com.lazybeartoby.btcmarket.model.entity.Market;
 import com.lazybeartoby.btcmarket.model.vo.BetVO;
 import com.lazybeartoby.btcmarket.repository.BetRepository;
 import com.lazybeartoby.btcmarket.repository.MarketRepository;
+import com.lazybeartoby.btcmarket.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -27,6 +28,7 @@ public class BetService {
     private final MarketRepository marketRepository;
     private final WalletService walletService;
     private final MarketService marketService;
+    private final UserRepository userRepository;
 
     @Value("${app.market.min-bet:1}")
     private BigDecimal minBet;
@@ -37,11 +39,13 @@ public class BetService {
     public BetService(BetRepository betRepository,
                      MarketRepository marketRepository,
                      WalletService walletService,
-                     MarketService marketService) {
+                     MarketService marketService,
+                     UserRepository userRepository) {
         this.betRepository = betRepository;
         this.marketRepository = marketRepository;
         this.walletService = walletService;
         this.marketService = marketService;
+        this.userRepository = userRepository;
     }
 
     @Transactional
@@ -121,6 +125,7 @@ public class BetService {
         vo.setResult(bet.getResult());
         vo.setCreatedAt(bet.getCreatedAt());
         vo.setSettledAt(bet.getSettledAt());
+        userRepository.findById(bet.getUserId()).ifPresent(u -> vo.setUsername(u.getUsername()));
         return vo;
     }
 

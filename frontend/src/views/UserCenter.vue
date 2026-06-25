@@ -1,73 +1,74 @@
 <template>
   <div class="container">
-    <h2 class="section-title">👤 用户中心</h2>
-
-    <!-- 钱包概览 -->
-    <div class="card">
-      <div style="display: flex; gap: 32px; flex-wrap: wrap;">
-        <div>
-          <div class="dim" style="font-size: 12px;">用户名</div>
-          <div style="font-size: 18px; font-weight: 600;">{{ store.user?.username }}</div>
+    <!-- Wallet Overview -->
+    <div class="pm-hero">
+      <div style="position: relative; z-index: 1;">
+        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+          <span style="font-size: 18px; font-weight: 700;">{{ store.user?.username }}</span>
+          <span class="tag tag-active">Connected</span>
         </div>
-        <div>
-          <div class="dim" style="font-size: 12px;">可用余额</div>
-          <div style="font-size: 22px; font-weight: 700; color: var(--up);">{{ fmt(wallet?.balance) }}</div>
-        </div>
-        <div>
-          <div class="dim" style="font-size: 12px;">冻结中</div>
-          <div style="font-size: 22px; font-weight: 600; color: var(--accent);">{{ fmt(wallet?.frozenBalance) }}</div>
-        </div>
-        <div>
-          <div class="dim" style="font-size: 12px;">累计盈亏</div>
-          <div style="font-size: 22px; font-weight: 600;" :class="(wallet?.totalProfit || 0) >= 0 ? 'up' : 'down'">
-            {{ (wallet?.totalProfit || 0) >= 0 ? '+' : '' }}{{ fmt(wallet?.totalProfit) }}
+        <div class="pm-stat-grid" style="margin: 0;">
+          <div class="pm-stat-item" style="text-align: left;">
+            <div class="stat-label">Available</div>
+            <div class="stat-value up">{{ fmt(wallet?.balance) }}</div>
+          </div>
+          <div class="pm-stat-item" style="text-align: left;">
+            <div class="stat-label">Frozen</div>
+            <div class="stat-value" style="color: var(--gold);">{{ fmt(wallet?.frozenBalance) }}</div>
+          </div>
+          <div class="pm-stat-item" style="text-align: left;">
+            <div class="stat-label">Total P&L</div>
+            <div class="stat-value" :class="(wallet?.totalProfit || 0) >= 0 ? 'up' : 'down'">
+              {{ (wallet?.totalProfit || 0) >= 0 ? '+' : '' }}{{ fmt(wallet?.totalProfit) }}
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 我的注单 -->
+    <!-- My Bets -->
     <div class="card">
-      <h3 class="section-title">🎯 我的注单</h3>
-      <div v-if="bets.length === 0" class="empty">暂无注单记录</div>
-      <table v-else>
-        <thead>
-          <tr><th>市场</th><th>方向</th><th>金额</th><th>赔率</th><th>结果</th><th>时间</th></tr>
-        </thead>
-        <tbody>
-          <tr v-for="b in bets" :key="b.id" style="cursor: pointer;" @click="$router.push('/market/' + b.marketId)">
-            <td>{{ b.marketTitle }}</td>
-            <td><span :class="['tag', b.direction === 'UP' ? 'tag-up' : 'tag-down']">{{ b.direction === 'UP' ? '涨' : '跌' }}</span></td>
-            <td>{{ b.amount }}</td>
-            <td>{{ b.odds }}x</td>
-            <td>
-              <span v-if="b.result === 'WIN'" class="up">赢 +{{ b.winAmount }}</span>
-              <span v-else-if="b.result === 'LOSE'" class="down">输 -{{ b.amount }}</span>
-              <span v-else class="tag tag-pending">待结算</span>
-            </td>
-            <td class="dim">{{ formatTime(b.createdAt) }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="section-title">My Bets</div>
+      <div v-if="bets.length === 0" class="empty">No bets yet</div>
+      <div v-else class="pm-bet-list">
+        <div v-for="b in bets" :key="b.id" style="padding: 14px 0; border-bottom: 1px solid var(--border); cursor: pointer;" @click="$router.push('/market/' + b.marketId)">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <span :class="['tag', b.direction === 'UP' ? 'tag-up' : 'tag-down']" style="min-width: 48px; text-align: center;">
+                {{ b.direction === 'UP' ? 'UP' : 'DOWN' }}
+              </span>
+              <span style="font-weight: 500;">{{ b.marketTitle }}</span>
+            </div>
+            <span style="font-variant-numeric: tabular-nums; font-weight: 600;">{{ b.amount }} pts</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-top: 6px; font-size: 12px; color: var(--text-dim);">
+            <span>{{ b.odds }}x &middot; {{ formatTime(b.createdAt) }}</span>
+            <span v-if="b.result === 'WIN'" class="up" style="font-weight: 600;">WIN +{{ b.winAmount }}</span>
+            <span v-else-if="b.result === 'LOSE'" class="down" style="font-weight: 600;">LOSE</span>
+            <span v-else class="tag tag-pending" style="font-size: 11px;">Pending</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- 积分流水 -->
+    <!-- Transactions -->
     <div class="card">
-      <h3 class="section-title">💰 积分流水</h3>
-      <div v-if="transactions.length === 0" class="empty">暂无流水记录</div>
-      <table v-else>
-        <thead>
-          <tr><th>类型</th><th>金额</th><th>备注</th><th>时间</th></tr>
-        </thead>
-        <tbody>
-          <tr v-for="t in transactions" :key="t.id">
-            <td>{{ typeText(t.type) }}</td>
-            <td :class="t.amount >= 0 ? 'up' : 'down'">{{ t.amount >= 0 ? '+' : '' }}{{ t.amount }}</td>
-            <td class="dim">{{ t.remark || '-' }}</td>
-            <td class="dim">{{ formatTime(t.createdAt) }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="section-title">Transaction History</div>
+      <div v-if="transactions.length === 0" class="empty">No transactions</div>
+      <div v-else>
+        <div v-for="t in transactions" :key="t.id" style="padding: 12px 0; border-bottom: 1px solid var(--border);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 500;">{{ typeText(t.type) }}</span>
+            <span :class="t.direction === 1 ? 'up' : 'down'" style="font-weight: 600; font-variant-numeric: tabular-nums;">
+              {{ t.direction === 1 ? '+' : '-' }}{{ t.amount }}
+            </span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-top: 4px; font-size: 12px; color: var(--text-dim);">
+            <span>{{ t.remark || '-' }}</span>
+            <span>{{ formatTime(t.createdAt) }}</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -83,7 +84,7 @@ const transactions = ref([])
 
 function fmt(n) {
   if (n == null) return '0.00'
-  return Number(n).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  return Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
 function formatTime(t) {
@@ -92,7 +93,15 @@ function formatTime(t) {
 }
 
 function typeText(t) {
-  return { REGISTER: '注册赠送', BET: '下注', WIN: '中奖', LOSE: '结算扣除', ADMIN_GRANT: '管理员发放', ADMIN_DEDUCT: '管理员扣除' }[t] || t
+  return {
+    BET_FREEZE: 'Bet Freeze',
+    BET_WIN: 'Bet Win',
+    BET_LOSS: 'Bet Loss',
+    BET_REFUND: 'Refund',
+    ADMIN_GRANT: 'Admin Grant',
+    ADMIN_DEDUCT: 'Admin Deduct',
+    REGISTER: 'Register Bonus'
+  }[t] || t
 }
 
 onMounted(async () => {

@@ -1,19 +1,22 @@
 <template>
   <div class="app-layout">
     <nav class="navbar">
-      <router-link to="/markets" class="logo">₿ BTC预测</router-link>
+      <router-link to="/markets" class="logo">
+        <span class="logo-icon">B</span>
+        <span>BTC Predict</span>
+      </router-link>
       <div class="nav-links">
-        <router-link to="/markets">市场</router-link>
-        <router-link to="/user" v-if="store.token">用户中心</router-link>
-        <router-link to="/admin" v-if="store.isAdmin">管理后台</router-link>
+        <router-link to="/markets">Markets</router-link>
+        <router-link to="/user" v-if="store.token">Portfolio</router-link>
+        <router-link to="/admin" v-if="store.isAdmin">Admin</router-link>
       </div>
       <div class="nav-right">
-        <span class="balance-chip" v-if="wallet">💰 {{ formatNum(wallet.balance) }}</span>
-        <span class="dim" v-if="!store.token">未登录</span>
-        <button class="btn btn-ghost" v-if="!store.token" @click="$router.push('/login')">登录</button>
+        <span class="balance-chip" v-if="wallet">{{ formatNum(wallet.balance) }} pts</span>
+        <span class="dim" v-if="!store.token" style="font-size: 13px;">Not connected</span>
+        <button class="btn btn-ghost" v-if="!store.token" @click="$router.push('/login')" style="padding: 7px 18px; font-size: 13px;">Connect</button>
         <template v-else>
-          <span class="dim">{{ store.user?.username }}</span>
-          <button class="btn btn-ghost" @click="logout">退出</button>
+          <span style="font-size: 13px; color: var(--text-dim);">{{ store.user?.username }}</span>
+          <button class="btn btn-ghost" @click="logout" style="padding: 7px 14px; font-size: 13px;">Exit</button>
         </template>
       </div>
     </nav>
@@ -33,11 +36,10 @@ const wallet = ref(null)
 const toast = ref({ show: false, msg: '', type: 'success' })
 
 let walletTimer = null
-let priceTimer = null
 
 function formatNum(n) {
   if (n == null) return '0'
-  return Number(n).toLocaleString('zh-CN', { maximumFractionDigits: 2 })
+  return Number(n).toLocaleString('en-US', { maximumFractionDigits: 2 })
 }
 
 function showToast(msg, type = 'success') {
@@ -63,7 +65,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   clearInterval(walletTimer)
-  clearInterval(priceTimer)
 })
 
 window.showToast = showToast

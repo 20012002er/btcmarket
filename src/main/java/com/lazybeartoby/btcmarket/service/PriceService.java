@@ -35,7 +35,7 @@ public class PriceService {
     private boolean fallbackSimulated;
 
     private final AtomicReference<PriceVO> latest = new AtomicReference<>();
-    private BigDecimal simulatedPrice = new BigDecimal("63000.00");
+    private BigDecimal simulatedPrice = new BigDecimal("107000.00");
 
     public PriceService(PriceTickRepository priceTickRepository) {
         this.priceTickRepository = priceTickRepository;
@@ -46,6 +46,20 @@ public class PriceService {
                 .baseUrl(BINANCE_24H_URL)
                 .requestFactory(factory)
                 .build();
+
+        // 从已有历史数据中恢复最新价格，避免模拟价格与实际脱节
+        try {
+            List<PriceTick> recent = priceTickRepository.findByAssetSymbolOrderByTimestampDesc(
+                    AppConstants.ASSET_BTC,
+                    org.springframework.data.domain.PageRequest.of(0, 1)
+            );
+            if (!recent.isEmpty()) {
+                simulatedPrice = recent.get(0).getPrice();
+                log.info("从历史数据恢复最新价格: {}", simulatedPrice);
+            }
+        } catch (Exception e) {
+            log.warn("恢复历史价格失败: {}", e.getMessage());
+        }
     }
 
     @Scheduled(fixedDelayString = "${app.price.fetch-interval-ms:3000}")
@@ -119,10 +133,9 @@ public class PriceService {
     }
 
     public List<PriceTick> recentTicks(int limit) {
-        List<PriceTick> all = priceTickRepository.findTop60ByAssetSymbolOrderByTimestampDesc(AppConstants.ASSET_BTC);
-        if (all.size() <= limit) {
-            return all;
-        }
-        return all.subList(0, limit);
+        return priceTickRepository.findByAssetSymbolOrderByTimestampDesc(
+                AppConstants.ASSET_BTC,
+                org.springframework.data.domain.PageRequest.of(0, limit)
+        );
     }
 }

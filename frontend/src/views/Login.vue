@@ -1,32 +1,34 @@
 <template>
-  <div class="container" style="max-width: 420px; margin-top: 60px;">
-    <div class="card">
-      <h2 style="margin-bottom: 6px;">{{ isLogin ? '登录' : '注册' }}</h2>
-      <p class="dim" style="margin-bottom: 20px;">BTC 涨跌预测市场</p>
+  <div class="container" style="max-width: 440px; margin-top: 80px;">
+    <div class="pm-hero" style="padding: 36px;">
+      <div style="position: relative; z-index: 1;">
+        <h2 style="font-size: 24px; margin-bottom: 4px;">{{ isLogin ? 'Welcome Back' : 'Create Account' }}</h2>
+        <p class="dim" style="margin-bottom: 28px;">BTC 5-Min Prediction Market</p>
 
-      <label class="field">
-        <span>用户名</span>
-        <input class="input" v-model="username" placeholder="3-32位" @keyup.enter="submit" />
-      </label>
-      <label class="field">
-        <span>密码</span>
-        <input class="input" type="password" v-model="password" placeholder="6-32位" @keyup.enter="submit" />
-      </label>
+        <label class="field">
+          <span>Username</span>
+          <input class="input" v-model="username" placeholder="3-32 characters" @keyup.enter="submit" />
+        </label>
+        <label class="field">
+          <span>Password</span>
+          <input class="input" type="password" v-model="password" placeholder="6-32 characters" @keyup.enter="submit" />
+        </label>
 
-      <p v-if="err" class="down" style="margin-bottom: 12px; font-size: 13px;">{{ err }}</p>
+        <p v-if="err" class="down" style="margin-bottom: 12px; font-size: 13px;">{{ err }}</p>
 
-      <button class="btn btn-primary" style="width: 100%;" @click="submit" :disabled="loading">
-        {{ loading ? '处理中...' : (isLogin ? '登录' : '注册') }}
-      </button>
+        <button :class="['btn', 'btn-primary']" style="width: 100%; padding: 14px; font-size: 15px;" @click="submit" :disabled="loading">
+          {{ loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Sign Up') }}
+        </button>
 
-      <p style="text-align: center; margin-top: 16px;" class="dim">
-        {{ isLogin ? '没有账号？' : '已有账号？' }}
-        <a href="#" @click.prevent="isLogin = !isLogin">{{ isLogin ? '去注册' : '去登录' }}</a>
-      </p>
+        <p style="text-align: center; margin-top: 20px;" class="dim">
+          {{ isLogin ? "Don't have an account?" : 'Already have an account?' }}
+          <a href="#" @click.prevent="isLogin = !isLogin">{{ isLogin ? 'Sign Up' : 'Sign In' }}</a>
+        </p>
 
-      <div style="margin-top: 20px; padding: 12px; background: var(--bg); border-radius: 8px; font-size: 12px;" class="dim">
-        演示账号：demo / demo123<br/>
-        管理员：admin / admin123
+        <div style="margin-top: 24px; padding: 14px; background: var(--bg-input); border-radius: var(--radius-sm); font-size: 12px;" class="dim">
+          Demo: demo / demo123<br/>
+          Admin: admin / admin123
+        </div>
       </div>
     </div>
   </div>
