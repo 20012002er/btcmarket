@@ -502,13 +502,21 @@ async function placeBet() {
 
 let timer = null
 let priceTimer = null
+let chartInitialized = false
+
+// 当 market 数据加载完成后，chart 容器才会渲染，此时再初始化 chart
+watch(market, (val) => {
+  if (val && !chartInitialized) {
+    chartInitialized = true
+    nextTick(() => initChart())
+  }
+})
 
 onMounted(() => {
   fetchData()
   fetchWallet()
   fetchPrice()
   fetchPriceHistory()
-  nextTick(() => initChart())
   timer = setInterval(fetchData, 5000)
   priceTimer = setInterval(() => { fetchPrice(); fetchPriceHistory() }, 5000)
 })
