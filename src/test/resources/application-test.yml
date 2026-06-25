@@ -1,0 +1,39 @@
+server:
+  port: 0
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:btcmarket_test;DB_CLOSE_DELAY=-1;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+    open-in-view: false
+
+app:
+  jwt:
+    secret: dGVzdF9zZWNyZXRfa2V5X2Zvcl9idGNtYXJrZXRfYXV0b21hdGVkX3Rlc3RpbmdfMjAyNg==
+    access-token-expire-minutes: 60
+  market:
+    platform-fee-rate: 0.02
+    min-bet: 1
+    max-bet: 100000
+    create-ahead-minutes: 10
+  price:
+    source: binance
+    fetch-interval-ms: 3000
+    fallback-simulated: true
+
+logging:
+  level:
+    com.lazybeartoby.btcmarket: INFO
